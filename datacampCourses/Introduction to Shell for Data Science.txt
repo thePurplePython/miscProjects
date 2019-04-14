@@ -1,0 +1,236 @@
+1 - Manipulating files and directories:
+###
+pwd
+ls
+relative path - location starting from pwd
+absolute path - begins with /
+cd
+.. - up 1 dir
+. - current dir
+~ - home dir
+cp <source> <target>
+cp <source> <source> <...if multiple sources> <target>
+mv <source> <source> <...if multiple sources> <target>
+mv <current_source_name> <new_target_name> ... CAUTION! if existing target name exists then source will overwrite target
+rm <file_name> 
+rmdir <dir_name> - dir must be empty
+mkdir <new_dir>
+==============================================
+2 - Manipulating data:
+###
+cat <file>
+less <file1> <file2> - :n (next file), :p (previous file), :q (quit)
+head <file> 
+head -n <# of lines> <file>
+ls -R <dir/file> - lists everything under that directory recursively
+ls -F - prints / after every directory name and * after every runnable program
+ex: ls -R -F /home/repl
+man = manual pages
+tail <file>
+cut -f <column #s> -d <delimitter> <file>
+ex: cut -d , -f 1 seasonal/spring.csv
+history = shows previous list of commands
+!<command> = runs most recent command
+
+grep <flags> <search term> <dir/file>
+grep's more common flags:
+:q
+-c: print a count of matching lines rather than the lines themselves
+-h: do not print the names of files when searching multiple files
+-i: ignore case (e.g., treat "Regression" and "regression" as matches)
+-l: print the names of files that contain matches, not the matches
+-n: print line numbers for matching lines
+-v: invert the match, i.e., only show lines that don't match
+ex:
+grep molar seasonal/autumn.csv
+grep -v -n molar seasonal/spring.csv
+grep -c incisor seasonal/autumn.csv seasonal/winter.csv
+=============================================
+3 - Combining tools:
+###
+> = outputs command to new file
+ex: head -n 5 seasonal/summer.csv > top.csv 
+| = chain commands together; uses output of command left of pipe as input to the commend right of pipe
+ex: head -n 5 seasonal/summer.csv | tail -n 3
+ex: cut -d , -f 2 seasonal/summer.csv | grep -v Tooth
+ex: cut -f2 -d, seasonal/autumn.csv | grep -v Tooth | head -n 2
+wc = word count
+ex: grep 2017-07 seasonal/spring.csv | wc -l
+* = wildcard
+ex: head -n 3 seasonal/s*.csv (prints only files starting with "s")
+
+--wildcard notes:
+? matches a single character, so 201?.txt will match 2017.txt or 2018.txt, but not 2017-01.txt.
+[...] matches any one of the characters inside the square brackets, so 201[78].txt matches 2017.txt or 2018.txt, but not 2016.txt.
+{...} matches any of the command-separated patterns inside the curly brackets, so {*.txt, *.csv} matches any file whose name ends with .txt or .csv, but not files whose names end with .pdf.
+
+--sort = sorts by default in asc order
+ex: cut -d , -f 2 seasonal/winter.csv | grep -v Tooth | sort -r
+
+--uniq = remove duplicate rows
+ex: cut -f 2 -d , seasonal/* | grep -v Tooth | sort -r| uniq -c
+
+--record count in files:
+wc -l seasonal/*
+remove line #:
+wc -l seasonal/* | grep -v wc -l
+sort files with fewest lines:
+wc -l seasonal/* | grep -v total | sort -r | head
+===============================================================================
+4 - Batch processing:
+###
+"set" command - lists env variables
+ex: set | grep USER
+ex: set | grep SHELL
+ex: echo $HOME
+ex: echo $OSTYPE
+
+--shell variables - local variables in a programming language
+ex: training=seasonal/summer.csv
+ex: head -n 1 $training
+
+--loops:
+//
+The loop's parts are:
+The skeleton `for ...variable... in ...list...; ...body...; done
+The list of things the loop is to process (in our case, the words gif, jpg, and png).
+The variable that keeps track of which thing the loop is currently processing (in our case, suffix).
+The body of the loop that does the processing (in our case, echo $suffix).
+//
+ex: $ for suffix in docx odt pdf; do echo $suffix; done
+
+docx
+odt
+pdf
+
+ex: $ for filename in people/*; do echo $filename; done
+people/agarwal.txt
+
+--assigning variables:
+ex: $ files=seasonal/*.csv
+$ for f in $files; do echo $f; done
+seasonal/autumn.csv
+seasonal/spring.csv
+seasonal/summer.csv
+seasonal/winter.csv
+
+ex: $ for file in seasonal/*.csv; do grep 2017-07 $file; done
+2017-07-10,incisor
+2017-07-10,wisdom
+2017-07-20,incisor
+2017-07-21,bicuspid
+2017-07-10,incisor
+2017-07-16,bicuspid
+2017-07-23,bicuspid
+2017-07-25,canine
+2017-07-01,incisor
+2017-07-17,canine
+
+--use surrounded '' with files with no _
+ex: mv 'July 2017.csv' '2017 July data.csv'
+
+--commands are separated by ;
+ex: for f in seasonal/*.csv; do echo $f; head -n 2 $f | tail -n 1; done
+seasonal/autumn.csv
+2017-01-05,canine
+seasonal/spring.csv
+2017-01-25,wisdom
+seasonal/summer.csv
+2017-01-11,canine
+seasonal/winter.csv
+2017-01-03,bicuspid
+======================================================================
+5 - Creating new tools:
+###
+--nano:
+Ctrl-K: delete a line.
+Ctrl-U: un-delete a line.
+Ctrl-O: save the file ('O' stands for 'output').
+Ctrl-X: exit the editor.
+
+--use history to write into another file:
+ex: $ cp seasonal/spring.csv seasonal/summer.csv ~
+$ grep -h -v Tooth spring.csv summer.csv > temp.csv
+$ history | tail -n 3 > steps.txt
+
+--shell script:
+$ nano dates.sh
+cut -d , -f 1 seasonal/*.csv
+bash dates.sh
+
+--count terms example:
+ex: $ nano teeth.sh
+cut -d , -f 2 seasonal/*.csv | grep -v Tooth | sort | uniq -c
+$ bash teeth.sh > teeth.out
+$ cat teeth.out
+     15 bicuspid
+     31 canine
+     18 incisor
+     11 molar
+     17 wisdom
+
+//
+--A script that processes specific files is useful as a record of what you did, but one that allows you to process any files you want is more useful. To support this, you can use the special expression $@ (dollar sign immediately followed by ampersand) to mean "all of the command-line parameters given to the script". For example, if unique-lines.sh contains this:
+
+sort $@ | uniq
+then when you run:
+
+bash unique-lines.sh seasonal/summer.csv
+the shell replaces $@ with seasonal/summer.csv and processes one file. If you run this:
+
+bash unique-lines.sh seasonal/*.csv
+it processes all four data files, and so on.
+//
+
+ex: $ nano count-records.sh
+tail -q -n +2 $@ | wc -l
+$ bash count-records.sh seasonal/* > num-records.out
+$ cat num-records.out
+92
+
+--using specific parameters:
+
+ex: select column ($1) from filename ($2)
+$ nano column.sh
+cut -d , -f $2 $1
+$ bash column.sh seasonal/autumn.csv 1
+
+--shell script loops
+$ nano date-range.sh
+
+# Print the first and last date from each data file.
+for filename in $@
+do
+    cut -d , -f 1 $filename | grep -v Date | sort | head -n 1
+    cut -d , -f 1 $filename | grep -v Date | sort | tail -n 1
+done
+
+$ bash date-range.sh seasonal/*.csv
+2017-01-05
+2017-08-16
+2017-01-25
+2017-09-07
+2017-01-11
+2017-08-04
+2017-01-03
+2017-08-13
+$ bash date-range.sh seasonal/*.csv | sort
+2017-01-03
+2017-01-05
+2017-01-11
+2017-01-25
+2017-08-04
+2017-08-13
+2017-08-16
+2017-09-07
+
+--stopping script
+$ bash current-time.sh
+Sun Feb 11 18:58:13 UTC 2018
+Sun Feb 11 18:58:14 UTC 2018
+Sun Feb 11 18:58:15 UTC 2018
+Sun Feb 11 18:58:16 UTC 2018
+Sun Feb 11 18:58:17 UTC 2018
+Sun Feb 11 18:58:18 UTC 2018
+^C
+$ ^C
