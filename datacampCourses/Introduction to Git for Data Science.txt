@@ -37,6 +37,3 @@
 => "git pull <remote> <targetbranch>" pulls in changes from a remote repo
 => "git push <remote> <targetbranch> pushes changes to a remote repo
 => "git" does not allow you to push changes to a remote repository unless you have merged the contents of the remote repository into your own work
-
-
-
