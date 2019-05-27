@@ -1,0 +1,42 @@
+// Introduction to Git for Data Science
+
+# 1 - Basic Workflow
+=> "git" stores all of its extra information in a directory called .git located in the root directory of the repository
+=> "git status" displays a list of the files in "staging area" that have been modified since the last time changes were saved
+=> "git diff" shows all the changes in a repository
+=> "git add <filename>" adds file to "staging area"
+=> 'git commit -m "comment"' or "git commit" (launches text editor) saves changes in the staging area
+=> "git log /path/to/file/directory" shows project's history
+
+#2 - Repositories
+=> "git show <hash_id first few chars>" shows specific commit details
+=> "git annotate <file>" shows version control modifications of object
+=> "git clean -f" deletes unwanted files
+=> "git config ..." sets configurations
+
+#3 - Undo
+=> "git checkout -- <filename>" to undo changes that haven't been staged yet
+=> "git reset <filename>" to undo changes that have been staged
+
+#4 - Working with Branches
+=> "branching" allows you to have multiple versions of your work, and lets you track each version systematically
+=> "git branch" displays # of branches within repository
+=> "git checkout <branchname> to switch to different branch
+=> "git checkout -b <branchname> to create new branch
+=> "git rm <filename>" to remove an object
+=> "git diff <branch1>..<branch2>" to compare 2 branches w/ one another
+=> "git merge <source_branch> <target_branch>" to merge branches
+
+#5 - Collaborating
+=> "git init <projectname>" creates a new git repo
+=> "git init /path/to/project" converts an existing path to a git project
+=> "git clone /path/to/existing/git/project <newname>" to copy an existing git repo in a new directory
+=> "git remote -v" to identify where cloned git repo originated from
+=> "git remote add <remotename> URLorPATH" creates a new remote
+=> "git" keeps track of remote repositories so that you can pull changes from those repositories and push changes to them
+=> "git pull <remote> <targetbranch>" pulls in changes from a remote repo
+=> "git push <remote> <targetbranch> pushes changes to a remote repo
+=> "git" does not allow you to push changes to a remote repository unless you have merged the contents of the remote repository into your own work
+
+
+
